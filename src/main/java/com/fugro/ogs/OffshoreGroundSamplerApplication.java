@@ -1,4 +1,4 @@
-package com.fugro.offshore_ground_sampler;
+package com.fugro.ogs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

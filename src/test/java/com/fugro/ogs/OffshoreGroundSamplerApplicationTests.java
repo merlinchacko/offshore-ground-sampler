@@ -1,4 +1,4 @@
-package com.fugro.offshore_ground_sampler;
+package com.fugro.ogs;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
