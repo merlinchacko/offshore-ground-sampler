@@ -37,12 +37,15 @@ public class SampleController
     @PostMapping
     public ResponseEntity<SampleDto> createSample(@Valid @RequestBody final SampleDto sampleDto)
     {
-        return new ResponseEntity<>(service.createSample(sampleDto), HttpStatus.CREATED);
+        final SampleDto created = service.createSample(sampleDto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SampleDto> updateSample(@PathVariable final Long id, @Valid @RequestBody final SampleDto sampleDto) {
-        return new ResponseEntity<>(service.updateSample(id, sampleDto), HttpStatus.OK);
+    public ResponseEntity<SampleDto> updateSample(@PathVariable final Long id, @Valid @RequestBody final SampleDto sampleDto)
+    {
+        final SampleDto updated = service.updateSample(id, sampleDto);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

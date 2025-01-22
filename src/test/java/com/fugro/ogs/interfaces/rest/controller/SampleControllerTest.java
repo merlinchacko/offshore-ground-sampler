@@ -1,5 +1,6 @@
 package com.fugro.ogs.interfaces.rest.controller;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -106,10 +107,10 @@ class SampleControllerTest
     {
         // given
         sampleDto.setShearStrength(50.0);
-        when(sampleService.updateSample(1L, sampleDto)).thenReturn(sampleDto);
+        when(sampleService.updateSample(anyLong(), any(SampleDto.class))).thenReturn(sampleDto);
 
         // when & then
-        mockMvc.perform(put("/api/v1/samples")
+        mockMvc.perform(put("/api/v1/samples/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleDto)))
             .andExpect(status().isOk())

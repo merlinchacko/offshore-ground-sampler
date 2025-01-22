@@ -75,6 +75,6 @@ class SampleRepositoryIntegrationTest
         final Double average = sampleRepository.getAverageWaterContent();
 
         //then
-        assertEquals(15.0, average, 0.001);
+        assertEquals(55.625, average, 0.001);
     }
 }

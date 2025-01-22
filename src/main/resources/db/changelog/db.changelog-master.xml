@@ -14,16 +14,15 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addAutoIncrement columnName="location_id" tableName="location" columnDataType="BIGINT"/>
     </changeSet>
 
     <!-- ChangeSet to insert dummy data into Location table -->
     <changeSet id="2" author="admin">
         <insert tableName="location">
-            <column name="location_id" value="1"/>
             <column name="name" value="New York"/>
         </insert>
         <insert tableName="location">
-            <column name="location_id" value="2"/>
             <column name="name" value="Los Angeles"/>
         </insert>
     </changeSet>
@@ -33,9 +32,6 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
         <createTable tableName="sample">
             <column name="sample_id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="sample_data" type="VARCHAR(255)">
-                <constraints nullable="false"/>
             </column>
             <column name="location_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -53,13 +49,12 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addAutoIncrement columnName="sample_id" tableName="sample" columnDataType="BIGINT"/>
     </changeSet>
 
     <!-- ChangeSet to insert sample data into Sample table -->
     <changeSet id="5" author="admin">
         <insert tableName="sample">
-            <column name="sample_id" value="1"/>
-            <column name="sample_data" value="Sample data for New York"/>
             <column name="location_id" value="1"/>
             <column name="date_collected" value="2025-01-01"/>
             <column name="unit_weight" value="15.5"/>
@@ -67,8 +62,6 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
             <column name="shear_strength" value="50.0"/>
         </insert>
         <insert tableName="sample">
-            <column name="sample_id" value="2"/>
-            <column name="sample_data" value="Sample data for Los Angeles"/>
             <column name="location_id" value="2"/>
             <column name="date_collected" value="2025-01-02"/>
             <column name="unit_weight" value="16.0"/>
