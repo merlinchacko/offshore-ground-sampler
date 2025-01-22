@@ -47,4 +47,34 @@ class SampleRepositoryIntegrationTest
         assertNotNull(sample);
         assertEquals("Amsterdam", sample.getLocation().getName());
     }
+
+    @Test
+    void shouldReturnAverageWaterContentFromAllSamples() {
+        // given
+        final Location location = new Location();
+        location.setName("Amsterdam");
+        final Location savedLocation = locationRepository.save(location);
+
+        final Sample sample1 = new Sample();
+        sample1.setLocation(savedLocation);
+        sample1.setDateCollected(LocalDate.now().minusDays(1));
+        sample1.setUnitWeight(15.0);
+        sample1.setWaterContent(100.0);
+        sample1.setShearStrength(100.0);
+        sampleRepository.save(sample1);
+
+        final Sample sample2 = new Sample();
+        sample2.setLocation(savedLocation);
+        sample2.setDateCollected(LocalDate.now().minusDays(1));
+        sample2.setUnitWeight(15.0);
+        sample2.setWaterContent(100.0);
+        sample2.setShearStrength(100.0);
+        sampleRepository.save(sample2);
+
+        // when
+        final Double average = sampleRepository.getAverageWaterContent();
+
+        //then
+        assertEquals(15.0, average, 0.001);
+    }
 }

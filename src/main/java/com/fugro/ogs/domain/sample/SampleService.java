@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface SampleService
 {
-
      List<SampleDto> getAllSamples();
 
      SampleDto createSample(SampleDto sampleDto);
