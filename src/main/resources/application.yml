@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none # Disable schema generation by JPA
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+ogs:
+  sample-threshold:
+    minWaterContentPercent: 5.0
+    maxWaterContentPercent: 150.0
+    minUnitWeightKNPerM3: 12.0
+    maxUnitWeightKNPerM3: 26.0
+    minShearStrengthKPa: 2.0
+    maxShearStrengthKPa: 1000.0
+
+logging:
+  level:
+    org.springframework.context.annotation: DEBUG

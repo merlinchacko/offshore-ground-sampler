@@ -47,6 +47,7 @@ class LocationControllerTest
     }
 
     @Test
+
     void shouldReturnAllLocations() throws Exception
     {
         // given
