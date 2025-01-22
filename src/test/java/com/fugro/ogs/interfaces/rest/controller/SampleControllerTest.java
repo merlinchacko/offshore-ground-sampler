@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +45,7 @@ class SampleControllerTest
     @BeforeEach
     void setUp()
     {
-        sampleDto = new SampleDto(1L, new LocationDto(1L, "Amsterdam"), LocalDate.now().minusDays(1), 50.0, 100.0, 56.0);
+        sampleDto = new SampleDto(1L, new LocationDto(1L, "Amsterdam"), LocalDate.now().minusDays(1), 20.0, 100.0, 56.0);
         sampleDtos = List.of(sampleDto);
     }
 
@@ -85,16 +86,36 @@ class SampleControllerTest
     }
 
     @Test
-    void shouldReturnBadRequestWhenDateCollectedIsInFuture() throws Exception {
-
+    void shouldReturnBadRequestWhenDateCollectedIsInFuture() throws Exception
+    {
+        // given
         sampleDto.setDateCollected(LocalDate.now().plusDays(1));
+        when(sampleService.createSample(any(SampleDto.class))).thenReturn(sampleDto);
 
+        // when & then
         mockMvc.perform(post("/api/v1/samples")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleDto)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
             .andExpect(jsonPath("$.message").value("dateCollected: Date collected must not be in the future"));
+    }
+
+    @Test
+    void shouldUpdateAnExistingSample() throws Exception
+    {
+        // given
+        sampleDto.setShearStrength(50.0);
+        when(sampleService.updateSample(1L, sampleDto)).thenReturn(sampleDto);
+
+        // when & then
+        mockMvc.perform(put("/api/v1/samples")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleDto)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.location.name").value("Amsterdam"))
+            .andExpect(jsonPath("$.shearStrength").value(50.0));
     }
 
     @Test

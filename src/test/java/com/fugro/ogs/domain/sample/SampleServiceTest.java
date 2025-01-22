@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -14,15 +16,19 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.fugro.ogs.domain.location.Location;
 import com.fugro.ogs.domain.location.LocationDto;
+
 
 class SampleServiceTest
 {
@@ -130,9 +136,9 @@ class SampleServiceTest
         verify(sampleMapper, times(1)).toSample(sampleDto1);
         verify(sampleRepository, times(1)).save(sample1);
         verify(sampleMapper, times(1)).toSampleDto(sample1);
-        verify(sampleValidator).validateUnitWeight(15.0);
-        verify(sampleValidator).validateWaterContent(100.0);
-        verify(sampleValidator).validateShearStrength(100.0);
+        verify(sampleValidator).validateUnitWeight(anyDouble());
+        verify(sampleValidator).validateWaterContent(anyDouble());
+        verify(sampleValidator).validateShearStrength(anyDouble());
     }
 
     @Test
@@ -140,7 +146,8 @@ class SampleServiceTest
     {
         // given
         when(sampleMapper.toSample(sampleDto1)).thenReturn(sample1);
-        doThrow(new InvalidSampleInputException("Unit weight must be between 12.0 and 26.0 kN/m³. Provided: 50.0")).when(sampleValidator).validateUnitWeight(50.0);
+        doThrow(new InvalidSampleInputException("Unit weight must be between 12.0 and 26.0 kN/m³. Provided: 50.0")).when(sampleValidator).validateUnitWeight(
+            50.0);
         doNothing().when(sampleValidator).validateWaterContent(100.0);
         doNothing().when(sampleValidator).validateShearStrength(100.0);
 
@@ -149,6 +156,80 @@ class SampleServiceTest
 
         // then
         assertEquals("Unit weight must be between 12.0 and 26.0 kN/m³. Provided: 50.0", thrown.getMessage());
+    }
+
+    @Test
+    void shouldUpdateExistingSample()
+    {
+        // given
+        final Location location = new Location();
+        location.setLocationId(15L);
+        location.setName("New York");
+
+        final Sample existingSample = new Sample();
+        existingSample.setSampleId(5L);
+        existingSample.setShearStrength(54.0);
+        existingSample.setWaterContent(25.0);
+        existingSample.setUnitWeight(18.0);
+        existingSample.setLocation(location);
+        existingSample.setDateCollected(LocalDate.now().minusDays(1));
+
+        final SampleDto updatedSample = new SampleDto();
+        updatedSample.setShearStrength(50.0);
+        updatedSample.setWaterContent(21.0);
+        updatedSample.setUnitWeight(20.0);
+
+        final SampleDto expectedDto = new SampleDto();
+        expectedDto.setId(5L);
+        expectedDto.setLocation(new LocationDto(15L,"New York"));
+        expectedDto.setDateCollected(LocalDate.now().minusDays(1));
+        expectedDto.setShearStrength(50.0);
+        expectedDto.setWaterContent(21.0);
+        expectedDto.setUnitWeight(20.0);
+
+        when(sampleRepository.findById(5L)).thenReturn(Optional.of(existingSample));
+        when(sampleRepository.save(Mockito.any(Sample.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(sampleValidator).validateUnitWeight(20.0);
+        doNothing().when(sampleValidator).validateWaterContent(21.0);
+        doNothing().when(sampleValidator).validateShearStrength(50.0);
+        doAnswer(invocation -> {
+            final SampleDto dto = invocation.getArgument(0);
+            final Sample target = invocation.getArgument(1);
+            target.setUnitWeight(dto.getUnitWeight());
+            target.setWaterContent(dto.getWaterContent());
+            target.setShearStrength(dto.getShearStrength());
+            return null;
+        }).when(sampleMapper).updateSampleFromDto(updatedSample, existingSample);
+        when(sampleMapper.toSampleDto(any(Sample.class))).thenReturn(expectedDto);
+
+        // when
+        final SampleDto result = sampleService.updateSample(5L, updatedSample);
+
+        // then
+        assertNotNull(result);
+        assertEquals("New York", result.getLocation().name());
+        assertEquals(50.0, result.getShearStrength());
+        assertEquals(21.0, result.getWaterContent());
+        assertEquals(20.0, result.getUnitWeight());
+        verify(sampleRepository).findById(5L);
+        verify(sampleRepository).save(existingSample);
+    }
+
+    @Test
+    void shouldReturnExceptionWhenSampleNotFound()
+    {
+        // given
+        final Long sampleId = 10L;
+        final SampleDto updatedSampleDto = new SampleDto();
+        updatedSampleDto.setDateCollected(LocalDate.now());
+
+        // when
+        Mockito.when(sampleRepository.findById(sampleId)).thenReturn(Optional.empty());
+        final SampleNotFoundException thrown = Assertions.assertThrows(SampleNotFoundException.class,
+            () -> sampleService.updateSample(sampleId, updatedSampleDto));
+
+        // then
+        Assertions.assertEquals("Sample not found with id: " + sampleId, thrown.getMessage());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.fugro.ogs.domain.sample;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -28,14 +29,26 @@ public class SampleServiceImpl implements SampleService
     @Override
     public SampleDto createSample(final SampleDto sampleDto)
     {
-        checkSampleThresholds(sampleDto.getWaterContent(), sampleDto.getUnitWeight(), sampleDto.getShearStrength());
+        checkSampleSurpassThresholds(sampleDto.getWaterContent(), sampleDto.getUnitWeight(), sampleDto.getShearStrength());
         final Sample sample = sampleMapper.toSample(sampleDto);
         final Sample savedSample = repository.save(sample);
 
         return sampleMapper.toSampleDto(savedSample);
     }
 
-    private void checkSampleThresholds(final double waterContent, final double unitWeight, final double shearStrength)
+    @Override
+    public SampleDto updateSample(final Long id, final SampleDto sampleDto)
+    {
+        return repository.findById(id)
+            .map(existingSample -> {
+                checkSampleSurpassThresholds(sampleDto.getWaterContent(), sampleDto.getUnitWeight(), sampleDto.getShearStrength());
+                sampleMapper.updateSampleFromDto(sampleDto, existingSample);
+                return sampleMapper.toSampleDto(repository.save(existingSample));
+            })
+            .orElseThrow(() -> new SampleNotFoundException("Sample not found with id: " + id));
+    }
+
+    private void checkSampleSurpassThresholds(final double waterContent, final double unitWeight, final double shearStrength)
     {
         sampleValidator.validateWaterContent(waterContent);
         sampleValidator.validateUnitWeight(unitWeight);
