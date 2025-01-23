@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 
 @RestController
-@RequestMapping("/api/v1/samples")
+@RequestMapping("/api/samples")
 @RequiredArgsConstructor
 public class SampleController
 {

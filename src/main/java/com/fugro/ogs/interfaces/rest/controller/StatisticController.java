@@ -9,7 +9,7 @@ import com.fugro.ogs.domain.sample.StatisticService;
 
 
 @RestController
-@RequestMapping("/api/v1/statistics")
+@RequestMapping("/api/statistics")
 @RequiredArgsConstructor
 public class StatisticController {
 

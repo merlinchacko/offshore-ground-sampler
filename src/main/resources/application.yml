@@ -12,9 +12,8 @@ spring:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: none # Disable schema generation by JPA
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
+      ddl-auto: update # Disable schema generation by JPA
+    defer-datasource-initialization: true
 
 ogs:
   sample-threshold:
@@ -25,6 +24,8 @@ ogs:
     minShearStrengthKPa: 2.0
     maxShearStrengthKPa: 1000.0
 
-logging:
-  level:
-    org.springframework.context.annotation: DEBUG
+security:
+  user:
+    username: user
+    password: password #store in keyvault
+    role: USER

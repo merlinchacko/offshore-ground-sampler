@@ -1,4 +1,4 @@
-package com.fugro.ogs.infrastructure;
+package com.fugro.ogs.application.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

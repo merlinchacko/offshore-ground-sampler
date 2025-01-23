@@ -1,4 +1,4 @@
-package com.fugro.ogs.infrastructure;
+package com.fugro.ogs.application.error;
 
 import java.util.Objects;
 import java.util.stream.Collectors;

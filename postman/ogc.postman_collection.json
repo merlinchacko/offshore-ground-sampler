@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "6ea50a1e-c5ce-425a-ae0d-14031c22ace0",
+		"name": "ogc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "locations",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "GetSamples",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "CreateNewSample",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"location\": {\n            \"locationId\": 1,\n            \"name\": \"New York\"\n    },\n      \"dateCollected\": \"2025-01-01\",\n      \"unitWeight\": 25,\n    \"waterContent\": 15.5,\n      \"shearStrength\": 70.0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/api/v1/samples",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"v1",
+						"samples"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -19,8 +19,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,7 +33,8 @@ import com.fugro.ogs.domain.sample.SampleDto;
 import com.fugro.ogs.domain.sample.SampleService;
 
 
-@WebMvcTest(SampleController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class SampleControllerTest
 {
     @Autowired
@@ -58,7 +62,7 @@ class SampleControllerTest
         when(sampleService.getAllSamples()).thenReturn(sampleDtos);
 
         // when
-        mockMvc.perform(get("/api/v1/samples"))
+        mockMvc.perform(get("/api/samples"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(1))
             .andExpect(jsonPath("$[0].location.name").value("Amsterdam"))
@@ -69,13 +73,14 @@ class SampleControllerTest
     }
 
     @Test
+    @WithMockUser(username = "${security.user.username}", password = "${security.user.password}", roles = "${security.user.role}")
     void shouldCreateNewSample() throws Exception
     {
         // given
         when(sampleService.createSample(any(SampleDto.class))).thenReturn(sampleDto);
 
         // when
-        mockMvc.perform(post("/api/v1/samples")
+        mockMvc.perform(post("/api/samples")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleDto)))
             .andExpect(status().isCreated())
@@ -87,6 +92,7 @@ class SampleControllerTest
     }
 
     @Test
+    @WithMockUser(username = "${security.user.username}", password = "${security.user.password}", roles = "${security.user.role}")
     void shouldReturnBadRequestWhenDateCollectedIsInFuture() throws Exception
     {
         // given
@@ -94,7 +100,7 @@ class SampleControllerTest
         when(sampleService.createSample(any(SampleDto.class))).thenReturn(sampleDto);
 
         // when & then
-        mockMvc.perform(post("/api/v1/samples")
+        mockMvc.perform(post("/api/samples")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleDto)))
             .andExpect(status().isBadRequest())
@@ -103,6 +109,7 @@ class SampleControllerTest
     }
 
     @Test
+    @WithMockUser(username = "${security.user.username}", password = "${security.user.password}", roles = "${security.user.role}")
     void shouldUpdateAnExistingSample() throws Exception
     {
         // given
@@ -110,7 +117,7 @@ class SampleControllerTest
         when(sampleService.updateSample(anyLong(), any(SampleDto.class))).thenReturn(sampleDto);
 
         // when & then
-        mockMvc.perform(put("/api/v1/samples/{id}", 1L)
+        mockMvc.perform(put("/api/samples/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleDto)))
             .andExpect(status().isOk())
@@ -120,13 +127,14 @@ class SampleControllerTest
     }
 
     @Test
+    @WithMockUser(username = "${security.user.username}", password = "${security.user.password}", roles = "${security.user.role}")
     void shouldDeleteSampleById() throws Exception
     {
         // given
         doNothing().when(sampleService).deleteSample(1L);
 
         // when
-        mockMvc.perform(delete("/api/v1/samples/{id}", 1L))
+        mockMvc.perform(delete("/api/samples/{id}", 1L))
             .andExpect(status().isNoContent());
 
         // then
